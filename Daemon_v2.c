@@ -53,7 +53,7 @@ void *test_execution()
     pclose(fp);
     
     pthread_detach(pthread_self());
-    printf("Result: %s\n",result);
+    //printf("Result: %s\n",result);
     // Send back the result
     //n = write(newsockfd,result,sizeof(result)-1);
     strcpy(test_status,"DONE EXECUTION");
@@ -68,8 +68,6 @@ void *tcp_connection( void *arguments )
 {
     struct arg_struct *args = arguments;
     
-    printf( "I am fine\n" );
-    
     int sockfd, newsockfd, portid,argc_check;
     portid = args->portno;
     argc_check = args->argc_main;
@@ -78,7 +76,6 @@ void *tcp_connection( void *arguments )
     //handling threads
     pthread_t internal_threads[ 2 ];
     int result_code;
-    
     bzero(execution_command,4096);
     
     struct sockaddr_in serv_addr, cli_addr;
@@ -94,6 +91,7 @@ void *tcp_connection( void *arguments )
     sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sockfd < 0)
         error("ERROR opening socket");
+    else printf("\nCreated Socket \n\n");
     bzero((char *) &serv_addr, sizeof(serv_addr));
     
     serv_addr.sin_family = AF_INET;
@@ -105,11 +103,15 @@ void *tcp_connection( void *arguments )
     if (bind(sockfd, (struct sockaddr *) &serv_addr,
              sizeof(serv_addr)) < 0)
         error("ERROR on binding");
+    else printf("Binding \n\n");
     
     
     
     // socket listening
     listen(sockfd,5);
+    if (newsockfd < 0)
+        error("ERROR on accept");
+    else printf("Listening \n\n");
     clilen = sizeof(cli_addr);
     int notdone =1;
     
@@ -125,11 +127,12 @@ void *tcp_connection( void *arguments )
                            &clilen);
         if (newsockfd < 0)
             error("ERROR on accept");
+        else printf(" Accepting Connections \n\n");
         bzero(buffer,4096);
         n = read(newsockfd,buffer,4096);
         if (n < 0) error("ERROR reading from socket");
         
-        printf("Here is the message: %s\n",buffer);
+        printf("Here is the message: %s\n\n",buffer);
         
         if (n < 0) error("ERROR writing to socket");
         //char result[20] = system(buffer); // should I use execl(),pipe(),fork() etc ??instead  Ask

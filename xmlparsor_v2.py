@@ -33,7 +33,7 @@ for s in modules:
 
    # TCP Connection
 
-    TCP_IP = '192.168.1.110'
+    TCP_IP = '192.168.160.148'
     TCP_PORT = 5007
     BUFFER_SIZE = 4096
     count=0
