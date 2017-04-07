@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestSuite>
+	<module ID="1">		# operational flag and data type can be provided later
+		<TestID>1.01</TestID>
+		<DataType>sysfs</DataType>
+		<HandleData> cat /sys/bus/i2c/devices/0-0079/name </HandleData>
+		<IsData>1</IsData>
+		<DataPath>0</DataPath>
+		<Log>readvalue</Log>
+		<Filename>test1.01_logcat</Filename>
+		<ExpectedResult>lcos-right</ExpectedResult>
+		<TimeOut>3</TimeOut>
+		<LoopCount>1</LoopCount>
+	</module>
+</TestSuite>
