@@ -29,9 +29,27 @@ struct arg_struct {
     int portno;
     int argc_main;
 };
+
+struct exec_arg_struct {
+    int test_timeout;
+    int test_loop;
+};
 //global variables
 
-char buffer[4096];
+// char buffer[4096]; NOW
+
+struct buff {
+    int a; //module ID
+    float b; //Test ID
+    char c[6]; //data type
+    int d; //handle data size
+    int e; // IsData
+    //char f[16]; //filename
+    int g; //Timeout
+    char h[2]; //Data path
+    int i; //loop count
+    
+}buffer;
 
 char execution_command[4096];
 
@@ -40,17 +58,51 @@ pthread_cond_t  condition_var   = PTHREAD_COND_INITIALIZER;
 
 char test_status[11];
 char ack[18];
-char result[11];
-//strcpy(test_status,"NA");
+char result[4096];
 
-void *test_execution()
+
+
+void *test_execution(void *execution_args)
 {
+    struct exec_arg_struct *execution_arguments= execution_args;
+    int TIMEOUT, LOOP;
+    TIMEOUT = execution_arguments->test_timeout;
+    LOOP = execution_arguments->test_loop;
+
     
-    
+//add while loop to it
     FILE *fp = popen(execution_command, "r");
-    sleep(5);
-    fgets(result, 11 , fp);
-    pclose(fp);
+    if (fp == NULL) {
+        printf("Failed to run command\n" );
+        exit(1);
+    }
+     //sleep(5);
+    if (fp != NULL) {
+        
+//Timeout implementation : Need to be improved
+        time_t startTime = time(NULL);
+
+        // should improve fget NULL ,write into a file
+        while (1) {
+            if(time(NULL) - startTime > 3) break;
+          //  printf("\ntime  diff %ld \n",(time(NULL) - startTime));
+            char *line;
+            line = fgets(result, 4096 , fp);
+            if (line == NULL) break;
+           // if (line[0] == 'd') printf("%s", line); /* line includes '\n' */
+            
+        }
+    }
+   
+    //fgets(result, 4096 , fp);
+    if (pclose(fp) == -1) {
+        fprintf(stderr,"ERROR, reported by pclose()");
+    } else {
+        /* Use macros described under wait() to inspect `status' in order
+         to determine success/failure of command executed by popen() */
+        
+    }
+
     
     pthread_detach(pthread_self());
     //printf("Result: %s\n",result);
@@ -109,9 +161,8 @@ void *tcp_connection( void *arguments )
     
     // socket listening
     listen(sockfd,5);
-    if (newsockfd < 0)
-        error("ERROR on accept");
-    else printf("Listening \n\n");
+    
+    printf("Listening \n\n");
     clilen = sizeof(cli_addr);
     int notdone =1;
     
@@ -120,46 +171,29 @@ void *tcp_connection( void *arguments )
     
     while (notdone) {
         
-        
     //accept connections
         newsockfd = accept(sockfd,
                            (struct sockaddr *) &cli_addr,
                            &clilen);
         if (newsockfd < 0)
             error("ERROR on accept");
-        else printf(" Accepting Connections \n\n");
-        bzero(buffer,4096);
-        n = read(newsockfd,buffer,4096);
+       // else printf(" Accepting Connections \n\n");
+        //bzero(buffer,4096); NOW
+        n = read(newsockfd,&buffer,4096);
         if (n < 0) error("ERROR reading from socket");
-        
-        printf("Here is the message: %s\n\n",buffer);
-        
-        if (n < 0) error("ERROR writing to socket");
-        //char result[20] = system(buffer); // should I use execl(),pipe(),fork() etc ??instead  Ask
-        
-       
+        //else printf("Here is the message: %d, %f , %s ,%d,%d,%d,%s,%d \n",buffer.a,buffer.b,buffer.c,buffer.d,buffer.e,buffer.g,buffer.h,buffer.i);
         
         
         //handling status
         
         
-        if(strcmp(buffer,"Status")== 0){
-            
-//            result_code = pthread_create( &internal_threads[1], NULL, status,NULL );
-//            assert( !result_code );
-//            //
-//            
-//            result_code = pthread_join( internal_threads[1], NULL );
-//            assert( !result_code );
-            
+        if(strcmp(buffer.c,"Status")== 0){
             n = write(newsockfd,test_status,sizeof(test_status));
             if (n < 0) error("ERROR writing to socket");
-           
-            
             close(newsockfd);
         
         }
-        else if (strcmp(buffer,"Result")== 0) {
+        else if (strcmp(buffer.c,"Result")== 0) {
             n = write(newsockfd,result,sizeof(result)-1);
              if (n < 0) error("ERROR writing to socket");
             close(newsockfd);
@@ -168,14 +202,28 @@ void *tcp_connection( void *arguments )
         
             // execute the user command
         else {
+           
+            //create a array which can have size of handle data
+            char * handle_data = malloc(sizeof(char) * buffer.d);
+           
+            
+            struct exec_arg_struct exec_args;
+            exec_args.test_loop=buffer.i;
+            exec_args.test_timeout=buffer.g;
+            n = read(newsockfd,handle_data,4096);
+            if (n < 0) error("ERROR reading from socket");
+           // else printf("2nd command %s",handle_data);
+
             strcpy(test_status,"IN PROGRESS");
-            strcpy(execution_command,buffer);
-         strcpy(ack,"TEST CASE Recieved");
-         n = write(newsockfd,ack,sizeof(ack));
-            
-            
-            result_code = pthread_create( &internal_threads[0], NULL, test_execution, NULL);
+            strcpy(execution_command,handle_data);
+            free(handle_data);
+            strcpy(ack,"TEST CASE Recieved");
+            n = write(newsockfd,ack,sizeof(ack));
+            result_code = pthread_create( &internal_threads[0], NULL, test_execution, &exec_args);
             assert( !result_code );
+            
+       
+           
         
         
        // else n = write(newsockfd,"Test Details recieved ..",22);
