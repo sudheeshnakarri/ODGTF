@@ -28,7 +28,7 @@ while $choice; do
     clear
     yn=$( menu )
     case $yn in
-        "1" ) echo "Manual Test Selected";  python ./jsonparsor.py;;
+        "1" ) echo "User Command Tests Selected";  python ./jsonparsor.py;;
         "2" ) echo -e >&2 "\n Development in Progress.Come back Later ! \n";;
         "3" ) echo -e >&2 "\n Development in Progress.Come back Later ! \n";;
         "0" ) exit;;
