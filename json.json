@@ -1,0 +1,29 @@
+{
+    
+        "module":[ {
+            "ID": "1",
+            "TestID": "1.01",
+            "DataType": "sysfs",
+            "HandleData": "cat /sys/bus/i2c/devices/0-0079/name ",
+            "IsData": "1",
+            "DataPath": "0",
+            "Log": "readvalue",
+            "ExpectedResult": "lcos-right",
+            "TimeOut": "7000",
+            "LoopCount": "40"
+        },
+        {
+            "ID": "1",
+            "TestID": "1.02",
+            "DataType": "sysfs",
+            "HandleData": "cat /sys/bus/i2c/devices/0-0079/name ",
+            "IsData": "1",
+            "DataPath": "0",
+            "Log": "readvalue",
+            "ExpectedResult": "lcos-right",
+            "TimeOut": "7000",
+            "LoopCount": "40"
+        }
+    ]
+    
+}
