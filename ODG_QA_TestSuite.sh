@@ -10,7 +10,7 @@ menu()
 {
     echo -e >&2 "\n\t\t\t\tODG QA TestSuite!\n"
     echo -e >&2 "Select Test Catagory:"
-    echo -e >&2 "\t\t1 -- User Inputs "
+    echo -e >&2 "\t\t1 -- User Commands "
     echo -e >&2 "\t\t2 -- Scripts -TODO"
     echo -e >&2 "\t\t3 -- Apks-TODO"
     echo -e >&2 "\t\t0 -- Exit"
